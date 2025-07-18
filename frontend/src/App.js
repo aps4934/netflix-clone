@@ -122,11 +122,15 @@ function App() {
   const fetchMovies = async (endpoint) => {
     try {
       const response = await fetch(`${TMDB_BASE_URL}${endpoint}?api_key=${TMDB_API_KEY}`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const data = await response.json();
-      return data.results;
+      return data.results || [];
     } catch (error) {
-      console.error('Error fetching movies:', error);
-      return [];
+      console.error('Error fetching movies, using mock data:', error);
+      // Return mock data if API fails
+      return mockMovies;
     }
   };
 
