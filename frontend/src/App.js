@@ -73,18 +73,33 @@ function App() {
     }
   };
 
-  const searchMovies = async (query) => {
+  const searchContent = async (query) => {
     if (!query.trim()) {
       setSearchResults([]);
       return;
     }
     
     try {
-      const response = await fetch(`${TMDB_BASE_URL}/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}`);
-      const data = await response.json();
-      setSearchResults(data.results || []);
+      const [movieResults, tvResults] = await Promise.all([
+        fetch(`${TMDB_BASE_URL}/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&language=en-US`),
+        fetch(`${TMDB_BASE_URL}/search/tv?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&language=en-US`)
+      ]);
+      
+      const movieData = await movieResults.json();
+      const tvData = await tvResults.json();
+      
+      // Combine and mark content type
+      const movies = (movieData.results || []).map(item => ({ ...item, content_type: 'movie' }));
+      const tvShows = (tvData.results || []).map(item => ({ 
+        ...item, 
+        content_type: 'tv',
+        title: item.name, // TV shows use 'name' instead of 'title'
+        release_date: item.first_air_date
+      }));
+      
+      setSearchResults([...movies, ...tvShows].slice(0, 20));
     } catch (error) {
-      console.error('Error searching movies:', error);
+      console.error('Error searching content:', error);
       setSearchResults([]);
     }
   };
