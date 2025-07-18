@@ -116,65 +116,128 @@ function App() {
     }
   };
 
-  // Use mock data immediately to avoid loading issues
   useEffect(() => {
-    setLoading(true);
-    
-    // Set mock data immediately
-    const setupMockData = () => {
-      setFeaturedMovie(mockMovies[0]);
-      setMovieRows([
-        { title: 'Trending Now', movies: mockMovies.slice(0, 5) },
-        { title: 'Popular on Netflix', movies: mockMovies.slice(1, 6) },
-        { title: 'Top Rated', movies: mockMovies.slice(2, 7) },
-        { title: 'New Releases', movies: mockMovies.slice(3, 8) },
-        { title: 'Now Playing', movies: mockMovies.slice(4, 9) }
-      ]);
-      setLoading(false);
-    };
-
-    // Try to fetch real data, but fallback to mock data quickly
     const loadData = async () => {
+      setLoading(true);
+      setApiError(false);
+      
       try {
-        // Short timeout to fail fast
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('API timeout')), 2000)
-        );
-        
-        const apiPromise = Promise.all([
+        // Fetch both movies and TV shows
+        const [
+          popularMovies,
+          trendingMovies,
+          topRatedMovies,
+          upcomingMovies,
+          popularTVShows,
+          trendingTVShows,
+          topRatedTVShows,
+          netflixOriginals
+        ] = await Promise.all([
           fetchMovies('/movie/popular'),
           fetchMovies('/trending/movie/day'),
           fetchMovies('/movie/top_rated'),
           fetchMovies('/movie/upcoming'),
-          fetchMovies('/movie/now_playing')
+          fetchTVShows('/tv/popular'),
+          fetchTVShows('/trending/tv/day'),
+          fetchTVShows('/tv/top_rated'),
+          fetchTVShows('/discover/tv?with_networks=213') // Netflix originals
         ]);
 
-        const [popular, trending, topRated, upcoming, nowPlaying] = await Promise.race([
-          apiPromise,
-          timeoutPromise
-        ]);
+        // Process TV shows to have consistent structure
+        const processedTVShows = (shows) => shows.map(show => ({
+          ...show,
+          title: show.name,
+          release_date: show.first_air_date,
+          content_type: 'tv'
+        }));
 
-        // If we get here, API worked
-        if (trending.length > 0) {
-          setFeaturedMovie(trending[0]);
-          setMovieRows([
-            { title: 'Trending Now', movies: trending },
-            { title: 'Popular on Netflix', movies: popular },
-            { title: 'Top Rated', movies: topRated },
-            { title: 'New Releases', movies: upcoming },
-            { title: 'Now Playing', movies: nowPlaying }
-          ]);
-        } else {
-          setupMockData();
+        const processedMovies = (movies) => movies.map(movie => ({
+          ...movie,
+          content_type: 'movie'
+        }));
+
+        // Set featured content (priority: Netflix originals, then trending)
+        const featuredContent = netflixOriginals.length > 0 ? netflixOriginals[0] : 
+                               trendingMovies.length > 0 ? trendingMovies[0] : 
+                               popularMovies.length > 0 ? popularMovies[0] : null;
+
+        if (featuredContent) {
+          setFeaturedMovie({
+            ...featuredContent,
+            title: featuredContent.title || featuredContent.name,
+            content_type: featuredContent.original_name ? 'tv' : 'movie'
+          });
         }
+
+        // Create movie rows with mixed content
+        const rows = [];
+        
+        if (netflixOriginals.length > 0) {
+          rows.push({ 
+            title: 'Netflix Originals', 
+            movies: processedTVShows(netflixOriginals) 
+          });
+        }
+        
+        if (trendingMovies.length > 0) {
+          rows.push({ 
+            title: 'Trending Now', 
+            movies: processedMovies(trendingMovies) 
+          });
+        }
+        
+        if (popularMovies.length > 0) {
+          rows.push({ 
+            title: 'Popular Movies', 
+            movies: processedMovies(popularMovies) 
+          });
+        }
+        
+        if (popularTVShows.length > 0) {
+          rows.push({ 
+            title: 'Popular TV Shows', 
+            movies: processedTVShows(popularTVShows) 
+          });
+        }
+        
+        if (topRatedMovies.length > 0) {
+          rows.push({ 
+            title: 'Top Rated Movies', 
+            movies: processedMovies(topRatedMovies) 
+          });
+        }
+        
+        if (trendingTVShows.length > 0) {
+          rows.push({ 
+            title: 'Trending TV Shows', 
+            movies: processedTVShows(trendingTVShows) 
+          });
+        }
+        
+        if (upcomingMovies.length > 0) {
+          rows.push({ 
+            title: 'Coming Soon', 
+            movies: processedMovies(upcomingMovies) 
+          });
+        }
+        
+        if (topRatedTVShows.length > 0) {
+          rows.push({ 
+            title: 'Top Rated TV Shows', 
+            movies: processedTVShows(topRatedTVShows) 
+          });
+        }
+
+        setMovieRows(rows);
+        
       } catch (error) {
-        console.log('API failed, using mock data:', error.message);
-        setupMockData();
+        console.error('Error loading data:', error);
+        setApiError(true);
       }
+
+      setLoading(false);
     };
 
-    // Start with mock data immediately, then try API
-    setupMockData();
     loadData();
   }, []);
 
