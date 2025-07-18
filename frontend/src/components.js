@@ -125,6 +125,11 @@ export const MovieCard = ({ movie, onPlay }) => {
     ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
     : 'https://images.unsplash.com/photo-1509347528160-9a9e33742cdb?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzZ8MHwxfHNlYXJjaHwxfHxtb3ZpZSUyMHBvc3RlcnxlbnwwfHx8YmxhY2t8MTc1MjgxNzYwNXww&ixlib=rb-4.1.0&q=85';
 
+  const contentType = movie.content_type || 'movie';
+  const title = movie.title || movie.name;
+  const releaseDate = movie.release_date || movie.first_air_date;
+  const year = releaseDate ? new Date(releaseDate).getFullYear() : '';
+
   return (
     <div 
       className={`movie-card ${isHovered ? 'hovered' : ''}`}
@@ -133,7 +138,7 @@ export const MovieCard = ({ movie, onPlay }) => {
     >
       <img 
         src={posterImage}
-        alt={movie.title}
+        alt={title}
         className={`movie-poster ${imageLoaded ? 'loaded' : ''}`}
         onLoad={() => setImageLoaded(true)}
       />
@@ -141,8 +146,12 @@ export const MovieCard = ({ movie, onPlay }) => {
       {isHovered && (
         <div className="movie-card-overlay">
           <div className="movie-card-content">
-            <h3 className="movie-card-title">{movie.title}</h3>
-            <p className="movie-card-rating">⭐ {movie.vote_average?.toFixed(1)}</p>
+            <h3 className="movie-card-title">{title}</h3>
+            <div className="movie-card-info">
+              <p className="movie-card-rating">⭐ {movie.vote_average?.toFixed(1)}</p>
+              {year && <p className="movie-card-year">{year}</p>}
+              <p className="movie-card-type">{contentType === 'tv' ? 'TV Series' : 'Movie'}</p>
+            </div>
             <button 
               className="movie-card-play-btn"
               onClick={() => onPlay(movie)}
