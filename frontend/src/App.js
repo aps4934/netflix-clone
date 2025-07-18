@@ -25,6 +25,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [showProfile, setShowProfile] = useState(false);
   const [currentProfile, setCurrentProfile] = useState('John Doe');
+  const [apiError, setApiError] = useState(false);
 
   // Fetch data from TMDB API
   const fetchMovies = async (endpoint) => {
