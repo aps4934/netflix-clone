@@ -118,67 +118,32 @@ function App() {
   const [showProfile, setShowProfile] = useState(false);
   const [currentProfile, setCurrentProfile] = useState('John Doe');
 
-  // Fetch data from TMDB API
-  const fetchMovies = async (endpoint) => {
-    try {
-      const response = await fetch(`${TMDB_BASE_URL}${endpoint}?api_key=${TMDB_API_KEY}`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const data = await response.json();
-      return data.results || [];
-    } catch (error) {
-      console.error('Error fetching movies, using mock data:', error);
-      // Return mock data if API fails
-      return mockMovies;
-    }
-  };
-
-  const fetchTrailerKey = async (movieId) => {
-    try {
-      const response = await fetch(`${TMDB_BASE_URL}/movie/${movieId}/videos?api_key=${TMDB_API_KEY}`);
-      const data = await response.json();
-      const trailer = data.results.find(video => video.type === 'Trailer' && video.site === 'YouTube');
-      return trailer ? trailer.key : null;
-    } catch (error) {
-      console.error('Error fetching trailer:', error);
-      return null;
-    }
-  };
-
-  const searchMovies = async (query) => {
-    if (!query.trim()) {
-      setSearchResults([]);
-      return;
-    }
-    
-    try {
-      const response = await fetch(`${TMDB_BASE_URL}/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}`);
-      const data = await response.json();
-      setSearchResults(data.results || []);
-    } catch (error) {
-      console.error('Error searching movies:', error);
-      setSearchResults([]);
-    }
-  };
-
-  const handlePlayTrailer = async (movie) => {
-    const trailerKey = await fetchTrailerKey(movie.id);
-    if (trailerKey) {
-      setSelectedVideo({ ...movie, trailerKey });
-    } else {
-      // Fallback to a sample trailer if no trailer found
-      setSelectedVideo({ ...movie, trailerKey: 'dQw4w9WgXcQ' });
-    }
-  };
-
+  // Use mock data immediately to avoid loading issues
   useEffect(() => {
+    setLoading(true);
+    
+    // Set mock data immediately
+    const setupMockData = () => {
+      setFeaturedMovie(mockMovies[0]);
+      setMovieRows([
+        { title: 'Trending Now', movies: mockMovies.slice(0, 5) },
+        { title: 'Popular on Netflix', movies: mockMovies.slice(1, 6) },
+        { title: 'Top Rated', movies: mockMovies.slice(2, 7) },
+        { title: 'New Releases', movies: mockMovies.slice(3, 8) },
+        { title: 'Now Playing', movies: mockMovies.slice(4, 9) }
+      ]);
+      setLoading(false);
+    };
+
+    // Try to fetch real data, but fallback to mock data quickly
     const loadData = async () => {
-      setLoading(true);
-      
       try {
-        // Fetch different categories - with shorter timeout to fail fast
-        const [popular, trending, topRated, upcoming, nowPlaying] = await Promise.all([
+        // Short timeout to fail fast
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('API timeout')), 2000)
+        );
+        
+        const apiPromise = Promise.all([
           fetchMovies('/movie/popular'),
           fetchMovies('/trending/movie/day'),
           fetchMovies('/movie/top_rated'),
@@ -186,39 +151,32 @@ function App() {
           fetchMovies('/movie/now_playing')
         ]);
 
-        // Set featured movie (first from trending or popular)
+        const [popular, trending, topRated, upcoming, nowPlaying] = await Promise.race([
+          apiPromise,
+          timeoutPromise
+        ]);
+
+        // If we get here, API worked
         if (trending.length > 0) {
           setFeaturedMovie(trending[0]);
-        } else if (popular.length > 0) {
-          setFeaturedMovie(popular[0]);
+          setMovieRows([
+            { title: 'Trending Now', movies: trending },
+            { title: 'Popular on Netflix', movies: popular },
+            { title: 'Top Rated', movies: topRated },
+            { title: 'New Releases', movies: upcoming },
+            { title: 'Now Playing', movies: nowPlaying }
+          ]);
         } else {
-          setFeaturedMovie(mockMovies[0]);
+          setupMockData();
         }
-
-        // Create movie rows
-        setMovieRows([
-          { title: 'Trending Now', movies: trending.length > 0 ? trending : mockMovies.slice(0, 5) },
-          { title: 'Popular on Netflix', movies: popular.length > 0 ? popular : mockMovies.slice(1, 6) },
-          { title: 'Top Rated', movies: topRated.length > 0 ? topRated : mockMovies.slice(2, 7) },
-          { title: 'New Releases', movies: upcoming.length > 0 ? upcoming : mockMovies.slice(3, 8) },
-          { title: 'Now Playing', movies: nowPlaying.length > 0 ? nowPlaying : mockMovies.slice(4, 9) }
-        ]);
       } catch (error) {
-        console.error('Error loading data:', error);
-        // Fallback to mock data
-        setFeaturedMovie(mockMovies[0]);
-        setMovieRows([
-          { title: 'Trending Now', movies: mockMovies.slice(0, 5) },
-          { title: 'Popular on Netflix', movies: mockMovies.slice(1, 6) },
-          { title: 'Top Rated', movies: mockMovies.slice(2, 7) },
-          { title: 'New Releases', movies: mockMovies.slice(3, 8) },
-          { title: 'Now Playing', movies: mockMovies.slice(4, 9) }
-        ]);
+        console.log('API failed, using mock data:', error.message);
+        setupMockData();
       }
-
-      setLoading(false);
     };
 
+    // Start with mock data immediately, then try API
+    setupMockData();
     loadData();
   }, []);
 
