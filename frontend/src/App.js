@@ -58,11 +58,14 @@ function App() {
     }
   };
 
-  const fetchTrailerKey = async (movieId) => {
+  const fetchTrailerKey = async (id, type = 'movie') => {
     try {
-      const response = await fetch(`${TMDB_BASE_URL}/movie/${movieId}/videos?api_key=${TMDB_API_KEY}`);
+      const response = await fetch(`${TMDB_BASE_URL}/${type}/${id}/videos?api_key=${TMDB_API_KEY}&language=en-US`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       const data = await response.json();
-      const trailer = data.results.find(video => video.type === 'Trailer' && video.site === 'YouTube');
+      const trailer = data.results?.find(video => video.type === 'Trailer' && video.site === 'YouTube');
       return trailer ? trailer.key : null;
     } catch (error) {
       console.error('Error fetching trailer:', error);
