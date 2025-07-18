@@ -43,6 +43,21 @@ function App() {
     }
   };
 
+  const fetchTVShows = async (endpoint) => {
+    try {
+      const response = await fetch(`${TMDB_BASE_URL}${endpoint}?api_key=${TMDB_API_KEY}&language=en-US`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      return data.results || [];
+    } catch (error) {
+      console.error('Error fetching TV shows:', error);
+      setApiError(true);
+      return [];
+    }
+  };
+
   const fetchTrailerKey = async (movieId) => {
     try {
       const response = await fetch(`${TMDB_BASE_URL}/movie/${movieId}/videos?api_key=${TMDB_API_KEY}`);
