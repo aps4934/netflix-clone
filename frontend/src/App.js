@@ -104,13 +104,15 @@ function App() {
     }
   };
 
-  const handlePlayTrailer = async (movie) => {
-    const trailerKey = await fetchTrailerKey(movie.id);
+  const handlePlayTrailer = async (item) => {
+    const contentType = item.content_type || 'movie';
+    const trailerKey = await fetchTrailerKey(item.id, contentType);
+    
     if (trailerKey) {
-      setSelectedVideo({ ...movie, trailerKey });
+      setSelectedVideo({ ...item, trailerKey, content_type: contentType });
     } else {
-      // Fallback to a sample trailer if no trailer found
-      setSelectedVideo({ ...movie, trailerKey: 'dQw4w9WgXcQ' });
+      // Fallback to a popular movie trailer
+      setSelectedVideo({ ...item, trailerKey: 'dQw4w9WgXcQ', content_type: contentType });
     }
   };
 
