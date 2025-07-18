@@ -241,10 +241,12 @@ function App() {
     loadData();
   }, []);
 
-  // Handle search
+  // Handle search with debouncing
   useEffect(() => {
     const debounce = setTimeout(() => {
-      searchMovies(searchQuery);
+      if (searchQuery.trim()) {
+        searchContent(searchQuery);
+      }
     }, 300);
 
     return () => clearTimeout(debounce);
