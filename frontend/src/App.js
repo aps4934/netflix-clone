@@ -176,28 +176,45 @@ function App() {
     const loadData = async () => {
       setLoading(true);
       
-      // Fetch different categories
-      const [popular, trending, topRated, upcoming, nowPlaying] = await Promise.all([
-        fetchMovies('/movie/popular'),
-        fetchMovies('/trending/movie/day'),
-        fetchMovies('/movie/top_rated'),
-        fetchMovies('/movie/upcoming'),
-        fetchMovies('/movie/now_playing')
-      ]);
+      try {
+        // Fetch different categories - with shorter timeout to fail fast
+        const [popular, trending, topRated, upcoming, nowPlaying] = await Promise.all([
+          fetchMovies('/movie/popular'),
+          fetchMovies('/trending/movie/day'),
+          fetchMovies('/movie/top_rated'),
+          fetchMovies('/movie/upcoming'),
+          fetchMovies('/movie/now_playing')
+        ]);
 
-      // Set featured movie (first from trending)
-      if (trending.length > 0) {
-        setFeaturedMovie(trending[0]);
+        // Set featured movie (first from trending or popular)
+        if (trending.length > 0) {
+          setFeaturedMovie(trending[0]);
+        } else if (popular.length > 0) {
+          setFeaturedMovie(popular[0]);
+        } else {
+          setFeaturedMovie(mockMovies[0]);
+        }
+
+        // Create movie rows
+        setMovieRows([
+          { title: 'Trending Now', movies: trending.length > 0 ? trending : mockMovies.slice(0, 5) },
+          { title: 'Popular on Netflix', movies: popular.length > 0 ? popular : mockMovies.slice(1, 6) },
+          { title: 'Top Rated', movies: topRated.length > 0 ? topRated : mockMovies.slice(2, 7) },
+          { title: 'New Releases', movies: upcoming.length > 0 ? upcoming : mockMovies.slice(3, 8) },
+          { title: 'Now Playing', movies: nowPlaying.length > 0 ? nowPlaying : mockMovies.slice(4, 9) }
+        ]);
+      } catch (error) {
+        console.error('Error loading data:', error);
+        // Fallback to mock data
+        setFeaturedMovie(mockMovies[0]);
+        setMovieRows([
+          { title: 'Trending Now', movies: mockMovies.slice(0, 5) },
+          { title: 'Popular on Netflix', movies: mockMovies.slice(1, 6) },
+          { title: 'Top Rated', movies: mockMovies.slice(2, 7) },
+          { title: 'New Releases', movies: mockMovies.slice(3, 8) },
+          { title: 'Now Playing', movies: mockMovies.slice(4, 9) }
+        ]);
       }
-
-      // Create movie rows
-      setMovieRows([
-        { title: 'Trending Now', movies: trending },
-        { title: 'Popular on Netflix', movies: popular },
-        { title: 'Top Rated', movies: topRated },
-        { title: 'New Releases', movies: upcoming },
-        { title: 'Now Playing', movies: nowPlaying }
-      ]);
 
       setLoading(false);
     };
