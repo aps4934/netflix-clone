@@ -53,35 +53,39 @@ Deploy   : Vercel / Netlify (frontend), Heroku / AWS / DigitalOcean (backend)
 🏗 Architecture & Folder Structure
 -------------------------------------------------------------------------------
 netflix-clone/
+├── .gitconfig
+├── .gitignore
+├── README.md
+├── test_result.md
+├── yarn.lock
 ├── backend/
 │   ├── requirements.txt
 │   └── server.py
 ├── frontend/
-│   ├── public/
-│   ├── src/
-│   │   ├── components.js
-│   │   ├── App.css
-│   │   ├── App.js
-│   │   ├── index.css
-│   │   ├── index.js
-│   │   └── components/
-│   │       ├── Header.js
-│   │       ├── Hero.js
-│   │       ├── MovieRow.js
-│   │       ├── VideoModal.js
-│   │       ├── SearchResults.js
-│   │       ├── ProfileSelector.js
-│   │       └── LoadingSpinner.js
-│   ├── package.json
-│   ├── tailwind.config.js
-│   ├── postcss.config.js
 │   ├── craco.config.js
-│   └── yarn.lock
-├── tests/
-│   └── __init__.py
-├── .gitignore
-├── README.md
-└── other config files (e.g. .env.example)
+│   ├── package.json
+│   ├── postcss.config.js
+│   ├── README.md
+│   ├── tailwind.config.js
+│   ├── yarn.lock
+│   ├── public/
+│   │   └── index.html
+│   └── src/
+│       ├── App.css
+│       ├── App.js
+│       ├── components.js
+│       ├── index.css
+│       ├── index.js
+│       └── components/
+│           ├── Header.js
+│           ├── Hero.js
+│           ├── MovieRow.js
+│           ├── VideoModal.js
+│           ├── SearchResults.js
+│           ├── ProfileSelector.js
+│           └── LoadingSpinner.js
+└── tests/
+    └── __init__.py
 
 Each subfolder (frontend / backend) is a separate application that communicates via HTTP APIs.
 
