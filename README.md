@@ -52,6 +52,8 @@ Deploy   : Vercel / Netlify (frontend), Heroku / AWS / DigitalOcean (backend)
 -------------------------------------------------------------------------------
 🏗 Architecture & Folder Structure
 -------------------------------------------------------------------------------
+
+```
 netflix-clone/
 ├── .gitconfig
 ├── .gitignore
@@ -86,6 +88,7 @@ netflix-clone/
 │           └── LoadingSpinner.js
 └── tests/
     └── __init__.py
+```
 
 Each subfolder (frontend / backend) is a separate application that communicates via HTTP APIs.
 
