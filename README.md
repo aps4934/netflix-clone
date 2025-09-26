@@ -1,6 +1,6 @@
 Netflix Clone 🎬
 
-A full-stack clone of Netflix — showcasing a streaming UI, authentication, backend API, and database integration.
+A full-stack clone of Netflix — showcasing a streaming UI with movie and TV show browsing, search, and trailer playback using TMDB API.
 
 -------------------------------------------------------------------------------
 🚀 Table of Contents
@@ -26,32 +26,27 @@ A full-stack clone of Netflix — showcasing a streaming UI, authentication, bac
 -------------------------------------------------------------------------------
 📖 About
 -------------------------------------------------------------------------------
-This project is a Netflix-like streaming service clone. Users can sign up, log in, 
-browse movies and TV shows, and stream content from a curated library (mock / sample content). 
-The goal is to practice full-stack development: frontend UI, backend APIs, authentication, 
-and state management.
+This project is a Netflix-like streaming service clone. Users can browse movies and TV shows, search for content, and play trailers from a curated library using the TMDB API. The goal is to practice full-stack development: frontend UI, backend APIs, and database integration.
 
 -------------------------------------------------------------------------------
 ✨ Features
 -------------------------------------------------------------------------------
-- User authentication (register / login / logout)
-- Browse list of movies / TV shows
-- Search functionality
+- Browse list of movies and TV shows from TMDB API
+- Search functionality for movies and TV shows
+- Play trailers in a modal
+- Profile selector
 - Responsive UI (desktop, tablet, mobile)
-- Protected routes for authenticated users
-- Integration with a mock content API / database
-- (Optional) Favorites / Watch list
-- (Optional) Trailers / playback preview
+- Integration with TMDB content API
+- Loading spinners and error handling
 
 -------------------------------------------------------------------------------
 🧰 Tech Stack
 -------------------------------------------------------------------------------
-Frontend : React, Redux / Context API, CSS / Styled Components
-Backend  : Node.js, Express
-Database : MongoDB / PostgreSQL
-Auth     : JWT / Sessions
-APIs     : RESTful endpoints
-Testing  : Jest, Supertest, React Testing Library
+Frontend : React 19, Tailwind CSS, Axios, React Router DOM
+Backend  : FastAPI, Uvicorn, Motor (async MongoDB driver)
+Database : MongoDB
+APIs     : TMDB API for content, RESTful endpoints
+Testing  : Pytest, Black, Isort, Flake8, MyPy
 Deploy   : Vercel / Netlify (frontend), Heroku / AWS / DigitalOcean (backend)
 
 -------------------------------------------------------------------------------
@@ -59,25 +54,34 @@ Deploy   : Vercel / Netlify (frontend), Heroku / AWS / DigitalOcean (backend)
 -------------------------------------------------------------------------------
 netflix-clone/
 ├── backend/
-│   ├── controllers/
-│   ├── models/
-│   ├── routes/
-│   ├── middlewares/
-│   ├── utils/
-│   └── server.js
+│   ├── requirements.txt
+│   └── server.py
 ├── frontend/
 │   ├── public/
 │   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── context/ or redux/
-│   │   ├── services/ (APIs)
-│   │   ├── styles/
-│   │   └── App.js / index.js
+│   │   ├── components.js
+│   │   ├── App.css
+│   │   ├── App.js
+│   │   ├── index.css
+│   │   ├── index.js
+│   │   └── components/
+│   │       ├── Header.js
+│   │       ├── Hero.js
+│   │       ├── MovieRow.js
+│   │       ├── VideoModal.js
+│   │       ├── SearchResults.js
+│   │       ├── ProfileSelector.js
+│   │       └── LoadingSpinner.js
+│   ├── package.json
+│   ├── tailwind.config.js
+│   ├── postcss.config.js
+│   ├── craco.config.js
+│   └── yarn.lock
 ├── tests/
+│   └── __init__.py
 ├── .gitignore
 ├── README.md
-└── other config files (e.g. .env.example, package.json, etc.)
+└── other config files (e.g. .env.example)
 
 Each subfolder (frontend / backend) is a separate application that communicates via HTTP APIs.
 
@@ -85,59 +89,60 @@ Each subfolder (frontend / backend) is a separate application that communicates 
 🛠 Getting Started
 -------------------------------------------------------------------------------
 Prerequisites:
-- Node.js (v14+ recommended)
-- npm or yarn
-- A running instance of your database (e.g., MongoDB server)
+- Node.js (v18+ recommended)
+- Python 3.8+
+- Yarn package manager
+- MongoDB (local or cloud instance)
 
 Installation:
 git clone https://github.com/aps4934/netflix-clone.git
 cd netflix-clone
 
-# in root (if tools / scripts exist)
-npm install
-
-# then in each subfolder
+# Install backend dependencies
 cd backend
-npm install
+pip install -r requirements.txt
+
+# Install frontend dependencies
 cd ../frontend
-npm install
+yarn install
 
 Running Locally:
 Start backend server:
 cd backend
-npm run dev
+uvicorn server:app --reload
 
 Start frontend:
 cd frontend
-npm start
+yarn start
 
 Then open http://localhost:3000 in your browser.
 
 -------------------------------------------------------------------------------
 🔐 Environment Variables
 -------------------------------------------------------------------------------
-Create an .env file in backend/ (and possibly frontend/) with variables such as:
+Create an .env file in backend/ with variables such as:
 
-PORT=5000
-DB_URI=your_database_uri
-JWT_SECRET=your_super_secret_key
+MONGO_URL=mongodb://localhost:27017
+DB_NAME=netflix_clone
+
+For TMDB API, the key is hardcoded in frontend/src/App.js (not recommended for production).
 
 -------------------------------------------------------------------------------
 🎮 Usage
 -------------------------------------------------------------------------------
-1. Register a new user or log in with existing credentials
-2. Browse the homepage to see movie / show listings
-3. Click into details pages, play trailers, etc.
-4. (If implemented) add items to your watchlist or favorites
+1. Browse the homepage to see movie and TV show listings
+2. Use the search bar to find specific content
+3. Click on items to play trailers
+4. Select a profile from the profile selector
 
 -------------------------------------------------------------------------------
 🧪 Testing
 -------------------------------------------------------------------------------
 cd backend
-npm test
+pytest
 
 cd ../frontend
-npm test
+yarn test
 
 -------------------------------------------------------------------------------
 🚀 Deployment
@@ -156,8 +161,10 @@ and ensure CORS / security settings are correct.
 -------------------------------------------------------------------------------
 🛤 Roadmap & Ideas
 -------------------------------------------------------------------------------
+- Add user authentication (register / login / logout)
+- Implement favorites / watchlist
 - Add pagination / infinite scroll
-- Support streaming (HLS / DASH)
+- Support actual streaming (HLS / DASH)
 - User profiles & multiple profiles
 - Ratings & reviews
 - Subscription / payment model
@@ -182,8 +189,9 @@ This project is licensed under the MIT License — see the LICENSE file for deta
 🙏 Acknowledgements
 -------------------------------------------------------------------------------
 - Netflix UI inspiration / designs
+- TMDB API for movie and TV show data
 - Tutorials, blogs, and open-source projects that helped you
-- Libraries & tools used (React, Express, etc.)
+- Libraries & tools used (React, FastAPI, Tailwind CSS, etc.)
 
 -------------------------------------------------------------------------------
 Made with ❤️ by Aditya Pratap Singh (https://github.com/aps4934)
