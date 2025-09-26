@@ -175,8 +175,10 @@ The project is deployed on Render. Follow these steps to deploy:
 1. Connect your GitHub repository to Render.
 2. Create a new Static Site service.
 3. Set the build settings:
-   - Build Command: `yarn build`
-   - Publish Directory: `build`
+   ```
+   Build Command: yarn build
+   Publish Directory: build
+   ```
 4. Set environment variables if needed (e.g., for API URLs).
 5. Deploy the service.
 
@@ -186,11 +188,15 @@ The project is deployed on Render. Follow these steps to deploy:
 2. Create a new Web Service.
 3. Set the runtime to Python.
 4. Set the build settings:
-   - Build Command: `pip install -r requirements.txt`
-   - Start Command: `uvicorn server:app --host 0.0.0.0 --port $PORT`
+   ```
+   Build Command: pip install -r requirements.txt
+   Start Command: uvicorn server:app --host 0.0.0.0 --port $PORT
+   ```
 5. Set environment variables in the Render dashboard:
-   - MONGO_URL: Your MongoDB connection string
-   - DB_NAME: netflix_clone
+   ```
+   MONGO_URL=your_mongo_connection_string
+   DB_NAME=netflix_clone
+   ```
 6. Deploy the service.
 
 Set the required environment variables in production, update API base URLs, 
