@@ -47,7 +47,7 @@ Backend  : FastAPI, Uvicorn, Motor (async MongoDB driver)
 Database : MongoDB
 APIs     : TMDB API for content, RESTful endpoints
 Testing  : Pytest, Black, Isort, Flake8, MyPy
-Deploy   : Vercel / Netlify (frontend), Heroku / AWS / DigitalOcean (backend)
+Deploy   : Render (frontend and backend)
 
 -------------------------------------------------------------------------------
 🏗 Architecture & Folder Structure
@@ -168,41 +168,30 @@ yarn test
 🚀 Deployment
 -------------------------------------------------------------------------------
 
-### Frontend Deployment (Vercel / Netlify)
+The project is deployed on Render. Follow these steps to deploy:
 
-1. Build the frontend:
-   ```
-   cd frontend
-   yarn build
-   ```
+### Frontend Deployment (Static Site)
 
-2. Deploy to Vercel:
-   - Install Vercel CLI: `npm install -g vercel`
-   - Run `vercel` in the frontend directory
-   - Follow the prompts to deploy
+1. Connect your GitHub repository to Render.
+2. Create a new Static Site service.
+3. Set the build settings:
+   - Build Command: `yarn build`
+   - Publish Directory: `build`
+4. Set environment variables if needed (e.g., for API URLs).
+5. Deploy the service.
 
-3. Deploy to Netlify:
-   - Upload the `build` folder to Netlify dashboard
-   - Or use Netlify CLI: `npm install -g netlify-cli`
-   - Run `netlify deploy --prod --dir=build`
+### Backend Deployment (Web Service)
 
-### Backend Deployment (Heroku)
-
-1. Create a Heroku app:
-   ```
-   heroku create your-app-name
-   ```
-
-2. Set environment variables:
-   ```
-   heroku config:set MONGO_URL=your_mongo_url
-   heroku config:set DB_NAME=netflix_clone
-   ```
-
-3. Deploy:
-   ```
-   git push heroku main
-   ```
+1. Connect your GitHub repository to Render.
+2. Create a new Web Service.
+3. Set the runtime to Python.
+4. Set the build settings:
+   - Build Command: `pip install -r requirements.txt`
+   - Start Command: `uvicorn server:app --host 0.0.0.0 --port $PORT`
+5. Set environment variables in the Render dashboard:
+   - MONGO_URL: Your MongoDB connection string
+   - DB_NAME: netflix_clone
+6. Deploy the service.
 
 Set the required environment variables in production, update API base URLs, 
 and ensure CORS / security settings are correct.
