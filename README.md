@@ -102,6 +102,8 @@ Prerequisites:
 - MongoDB (local or cloud instance)
 
 Installation:
+
+```
 git clone https://github.com/aps4934/netflix-clone.git
 cd netflix-clone
 
@@ -112,15 +114,23 @@ pip install -r requirements.txt
 # Install frontend dependencies
 cd ../frontend
 yarn install
+```
 
 Running Locally:
+
 Start backend server:
+
+```
 cd backend
 uvicorn server:app --reload
+```
 
 Start frontend:
+
+```
 cd frontend
 yarn start
+```
 
 Then open http://localhost:3000 in your browser.
 
